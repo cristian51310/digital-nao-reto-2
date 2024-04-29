@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+</head>
+<body>
+<h2>
+    Listado de autores por búsqueda
+</h2>
+
+<div th:each="author : ${authors}">
+    <p th:text="${author}"></p>
+</div>
+</body>
+</html>

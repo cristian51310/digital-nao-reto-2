@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authors</title>
+</head>
+<body>
+    <h2>
+        Listado de autores
+    </h2>
+
+    <div th:each="author : ${authors}">
+        <p th:text="${author.name}"></p>
+    </div>
+</body>
+</html>
