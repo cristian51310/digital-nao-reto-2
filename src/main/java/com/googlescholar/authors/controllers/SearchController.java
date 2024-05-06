@@ -1,5 +1,6 @@
 package com.googlescholar.authors.controllers;
 
+import com.googlescholar.authors.models.Author;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,9 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,11 +22,16 @@ public class SearchController {
 
     @GetMapping({"", "/"})
     public String showSearchList(Model model) {
-        String key = "15926fac5fb1a7b191a3e7016f757dd82c12cbb1db9525ae85ca84d9574fcc15";
+        String key = "key=15926fac5fb1a7b191a3e7016f757dd82c12cbb1db9525ae85ca84d9574fcc15";
+        String query = "Universidad Nacional Autónoma de México";
+
+        String queryEncoded = query.replace(" ", "+");
+
+        String mauthors = "mauthors=" + queryEncoded;
 
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://serpapi.com/search?engine=google_scholar_profiles&mauthors=unam&key=" + key))
+                .uri(URI.create("https://serpapi.com/search?engine=google_scholar_profiles&mauthors=unam" + "&" + key))
                 .GET()
                 .build();
 
@@ -39,7 +43,7 @@ public class SearchController {
             JsonNode jsonResponse = objectMapper.readTree(response.body());
 
             // Obtener la lista de autores del JSON
-            List<String> authors = getAuthorsFromJson(jsonResponse);
+            List<Author> authors = getAuthorsFromJson(jsonResponse);
 
             // Agregar la lista de autores al modelo
             model.addAttribute("authors", authors);
@@ -50,19 +54,25 @@ public class SearchController {
         return "search/index";
     }
 
-    // Método para extraer los nombres de los autores del JSON
-    private List<String> getAuthorsFromJson(JsonNode jsonResponse) {
-        List<String> authors = new ArrayList<>();
+    private List<Author> getAuthorsFromJson(JsonNode jsonResponse) {
+        List<Author> authors = new ArrayList<>();
 
         // Obtener el nodo "profiles" del JSON
         JsonNode profilesNode = jsonResponse.get("profiles");
 
         if (profilesNode != null && profilesNode.isArray()) {
 
-            // iterar sobre el arreglo de perfiles y obtener el nombre
+            // iterar sobre la lista de autores y obtener la data
             for (JsonNode profileNode : profilesNode) {
-                String name = profileNode.get("name").asText();
-                authors.add(name);
+                Author author = new Author();
+                author.setName(profileNode.get("name").asText());
+                author.setLink(profileNode.get("link").asText());
+                author.setAffiliation(profileNode.get("affiliations").asText());
+                author.setEmail(profileNode.get("email").asText());
+                author.setCitedBy(profileNode.get("cited_by").asInt());
+                author.setThumbnail(profileNode.get("thumbnail").asText());
+
+                authors.add(author);
             }
         }
 

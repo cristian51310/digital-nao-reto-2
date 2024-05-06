@@ -2,15 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/search.css">
     <title>Search</title>
 </head>
 <body>
-<h2>
+<h1>
     Listado de autores por búsqueda
-</h2>
+</h1>
 
-<div th:each="author : ${authors}">
-    <p th:text="${author}"></p>
-</div>
+<main>
+    <section th:each="author : ${authors}">
+        <a th:href="${author.link}" target="_blank" rel="noreferrer">
+            <div>
+                <img th:src="${author.thumbnail}">
+                <p class="name" th:text="${author.name}"></p>
+                <p class="description" th:text="${author.affiliation}"></p>
+                <p class="email" th:text="${author.email}"></p>
+
+                <span th:text="'Veces citado: ' + ${author.citedBy}"></span>
+            </div>
+        </a>
+    </section>
+</main>
 </body>
 </html>
